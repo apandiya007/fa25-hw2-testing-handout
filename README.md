@@ -10,7 +10,7 @@
 
 Tests:
 - Passing the wrong data type (look at documentation to fix datatype)
-  - strings vs lists (look the same when compare __str__
+  - strings vs lists (they look the same when compare str method)
 - Tests where something was supposed to be unused from outside of the class, but it was used anyways, and that messed up the test
 
  
