@@ -1,5 +1,13 @@
 # Homework 2
 
+## Learning Outcomes
+
+- Debug existing code
+- Write tests to catch bugs in unseen code
+- Practice adhering to the level of visibility set in existing code
+- Use Generic type annotations
+- Write and analyze a stakeholder-value matrix
+
 ## Part 1 
 - Provide some tests for the codebase to be used in HW3
    - Provide a short Pandas piece of code reading in the dataset
