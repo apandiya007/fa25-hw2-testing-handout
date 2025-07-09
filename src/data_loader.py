@@ -41,20 +41,20 @@ class DataLoader:
         try:
             # BUG 1: Wrong delimiter used - should be ',' but using ';'
             self._data = pd.read_csv(self.filepath, delimiter=';')
-            
-            print(f"Dataset loaded successfully!")
+
+            print("Dataset loaded successfully!")
             print(f"Shape: {self._data.shape}")
             print(f"Columns: {list(self._data.columns)}")
-            
+
             # BUG 2: Accessing private method from wrong context
             self._validate_required_columns()
-            
+
             self.__processed = True
             return self._data
-            
+
         except Exception as e:
             raise ValueError(f"Could not load data: {str(e)}")
-    
+
     def _validate_required_columns(self) -> bool:
         """
         Private method to validate that required columns exist.
@@ -66,20 +66,20 @@ class DataLoader:
         Raises:
             KeyError: If required columns are missing
         """
-        required_cols = ['case_enquiry_id', 'open_dt', 'target_dt', 
+        required_cols = ['case_enquiry_id', 'open_dt', 'target_dt',
                         'closed_dt', 'category', 'latitude', 'longitude', 
                         'neighborhood']
-        
+
         missing_cols = []
         for col in required_cols:
             if col not in self._data.columns:
                 missing_cols.append(col)
-        
+
         if missing_cols:
             raise KeyError(f"Missing required columns: {missing_cols}")
-        
+
         return True
-    
+
     def get_basic_stats(self) -> Dict[str, Any]:
         """
         Get basic statistics about the loaded dataset.
@@ -92,7 +92,7 @@ class DataLoader:
         """
         if self._data is None:
             raise ValueError("Data must be loaded first using load_and_explore_data()")
-        
+
         # BUG 3: Wrong method call - should be .describe() not .summary()
         stats = {
             'shape': self._data.shape,
@@ -100,9 +100,9 @@ class DataLoader:
             'null_counts': self._data.isnull().sum(),
             'unique_neighborhoods': len(self._data['neighborhood'].unique())
         }
-        
+
         return stats
-    
+
     def filter_by_city(self, cities: List[str]) -> pd.DataFrame:
         """
         Filter data by city names (Oakland vs Boston).
@@ -121,18 +121,17 @@ class DataLoader:
         if isinstance(cities, str):
             # Should raise TypeError but instead tries to convert
             cities = cities.split(',')  # This causes issues with single city names
-        
+
         if self._data is None:
             raise ValueError("Data must be loaded first")
-        
+
         # BUG 5: Case-sensitive comparison when data might have mixed case
         filtered_data = self._data[self._data['city'].isin(cities)]
-        
+
         if len(filtered_data) == 0:
             raise ValueError(f"No data found for cities: {cities}")
-        
+
         return filtered_data
-    
     @property
     def is_processed(self) -> bool:
         """
@@ -142,7 +141,7 @@ class DataLoader:
             bool: True if data is processed
         """
         return self.__processed
-    
+
     def _get_raw_data(self) -> pd.DataFrame:
         """
         Private method to get raw data - should not be called externally.
