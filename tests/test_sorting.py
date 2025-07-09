@@ -14,7 +14,7 @@ Run with: pytest test_sorting.py -v
 import pytest
 import pandas as pd
 import numpy as np
-from sorting import sort_by_days_open, create_urgency_ranking, filter_data, sort_by_urgency
+from src.sorting import sort_by_days_open, create_urgency_ranking, filter_data, sort_by_urgency
 
 
 class TestCaseSorter:
