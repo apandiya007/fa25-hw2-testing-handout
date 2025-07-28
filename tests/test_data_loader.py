@@ -8,7 +8,7 @@ Instructions for students:
 3. Fix the bugs in data_loader.py until all tests pass
 4. Add additional tests as needed to improve coverage
 
-Run with: pytest test_data_loader.py -v
+Run with: python3 test_runner.py
 """
 
 import pytest
@@ -121,7 +121,3 @@ class TestDataLoaderEdgeCases:
         # Write test for CSV with only headers
         # Should load but have 0 rows
         pass
-
-
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])

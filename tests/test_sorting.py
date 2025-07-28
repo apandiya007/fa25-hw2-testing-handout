@@ -8,7 +8,7 @@ Instructions for students:
 3. Fix the bugs in sorting.py until all tests pass
 4. Add additional tests as needed to improve coverage
 
-Run with: pytest test_sorting.py -v
+Run with: python3 test_runner.py
 """
 
 import pytest

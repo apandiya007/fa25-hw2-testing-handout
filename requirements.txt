@@ -1,0 +1,5 @@
+coverage
+pylint
+pandas
+numpy
+pandas-stubs
