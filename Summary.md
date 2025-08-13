@@ -3,15 +3,15 @@ Answer all the questions. Please put your answers *after* the italicized instruc
 
 ## Privacy Analysis
 
-Please fill out the following table. Some answers have been filled out for you.
+The following table discusses the data being tested: 311 service requests. We will dive further into data analysis next week, but we can discuss the privacy of any people whose data might be in those calls. Please fill out the table. Some answers have been filled out for you.
 
 | Question | Answer |
 | -------- | ------ |
 | What type of information is shared? | YOUR ANSWER HERE |
-| Who is the subject of the information? | The student who is applying for housing |
-| Who is the sender of the information? | The student who is applying ror housing |
-| Who are the potential recipients of the information? | Intended recipient: Housing services<br />Unintended recipient(s): YOUR ANSWER HERE |
-| What principles govern the collection and transmission of the information? | Students are required to fill out this application to be eligible for housing. |
+| Who is the subject of the information? | Anybody who gives personal info while making a 311 service request |
+| Who is the sender of the information? | The person whose details are included, but also the public 311 dataset publisher |
+| Who are the potential recipients of the information? | Intended recipient: 311 service workers<br />Unintended recipient(s): YOUR ANSWER HERE |
+| What principles govern the collection and transmission of the information? | 311 service requests are often the most efficient way to access necessary services, and it is possible to unintentionally leak personal info while making a request. |
 
 [10 points]  
 *Answer:*
