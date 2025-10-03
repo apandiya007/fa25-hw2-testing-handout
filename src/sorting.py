@@ -30,7 +30,15 @@ class CaseSorter:
             KeyError: If 'days_open' column doesn't exist
             ValueError: If days_open contains non-numeric values
         """
-        pass
+        if "days_open" not in df.columns:
+            raise KeyError("Missing required column: days_open")
+        
+        # ensures numerics
+        if not pd.api.types.is_numeric_dtype(df["days_open"]):
+            raise ValueError("Column 'days_open' must contain numeric values")
+        
+        return df.sort_values(by="days_open", ascending=ascending, ignore_index=True)
+
 
     def create_urgency_ranking(self, df: pd.DataFrame) -> dict[str, int]:
         """
@@ -46,7 +54,18 @@ class CaseSorter:
         Raises:
             KeyError: If 'category' column doesn't exist
         """
-        pass
+        if "category" not in df.columns:
+            raise KeyError("Missing required column: category")
+        
+        categories = df["category"].dropna().unique()
+
+        # Assigns urgency based on order of appearance
+        ranking = {cat: rank + 1 for rank, cat in enumerate(categories)}
+
+        if not ranking:
+            raise ValueError("Urgency ranking could not be created (no categories found)")
+        
+        return ranking
 
     def filter_data(self, df: pd.DataFrame, urgency_ranking: dict[str, int]) -> pd.DataFrame:
         """
@@ -63,7 +82,19 @@ class CaseSorter:
             ValueError: If urgency_ranking is empty
             KeyError: If 'category' column doesn't exist
         """
-        pass
+        if not urgency_ranking:
+            raise ValueError("Urgency ranking is empty")
+        
+        if "category" not in df.columns:
+            raise KeyError("Missing required column: category")
+        
+        filtered = df[df["category"].isin(urgency_ranking.keys())]
+
+        if filtered.empty:
+            raise ValueError("No data matches the urgency ranking")
+        
+        return filtered.reset_index(drop=True)
+
 
     def sort_by_urgency(self, df: pd.DataFrame, urgency_ranking: dict[str, int]) -> pd.DataFrame:
         """
@@ -80,7 +111,35 @@ class CaseSorter:
             ValueError: If urgency_ranking is empty
             KeyError: If 'category' column doesn't exist
         """
-        pass
+        if not urgency_ranking:
+            raise ValueError("Urgency ranking is empty")
+        
+        if "category" not in df.columns:
+            raise KeyError("Missing required column: category")
+        
+        if "days_open" not in df.columns:
+            raise KeyError("Missing required column: days_open")
+        
+        #checks for numeric days_open
+        if not pd.api.types.is_numeric_dtype(df["days_open"]):
+            raise ValueError("Column 'days_open' must contain numeric values")
+        
+        missing = set(df["category"].unique()) - set(urgency_ranking.keys())
+        if missing:
+            raise ValueError(f"Urgency ranking missing categories: {missing}")
+        
+        df = df.copy()
+        df["urgency_score"] = df["category"].map(urgency_ranking)
+
+        return df.sort_values(
+            by=["urgency_score", "days_open"],
+            ascending=[True, False], 
+            ignore_index=True
+        )
+
+
+        
+
 
     def _calculate_priority_score(self, urgency: int, days_open: int) -> float:
         """
@@ -94,4 +153,8 @@ class CaseSorter:
         Returns:
             float: Priority score
         """
-        pass
+        if not isinstance(urgency, (int, np.integer)) or not isinstance(days_open, (int, np.integer)):
+            raise ValueError("Urgency and days_open must be integers")
+        
+        #Lower urgency is more important
+        return 1 / urgency + (days_open / 100.0)

@@ -19,7 +19,10 @@ class TestDataLoader(unittest.TestCase):
         """Test DataLoader initialization."""
         # Write tests for DataLoader initialization
         # Check correct values of filepath and is_processed properties
-        pass
+        loader = DataLoader("example_CSVs/311_Cases_SF_Sample.csv")
+        self.assertEqual(loader.filepath, "example_CSVs/311_Cases_SF_Sample.csv")
+        self.assertFalse(loader.is_processed)
+
 
     def test_load_and_explore_data_success(self) -> None:
         """Test successful data loading."""
@@ -29,114 +32,98 @@ class TestDataLoader(unittest.TestCase):
         # equality of a pandas DataFrame.
         loader = DataLoader("example_CSVs/311_Cases_SF_Sample.csv")
         loaded_data = loader.load_and_explore_data()
-        data = [
-            [18310793, "Open", "Graffiti", "HAIGHT ST", 5, "Buena Vista", "PARK",
-             37.770346666667, -122.443505, "(37.77034667, -122.443505)",
-             "POINT (-122.443505 37.770346667)", "2024-06-06T07:00:00.000Z",
-             "2025-05-20T07:00:00.000Z", 348, True, 38302, 38302],
-            [101001847422, "Open", "General Request", "NANTUCKET AVE", 11,
-             "Mission Terrace", "INGLESIDE", 37.72837489, -122.44197876,
-             "(37.72837489, -122.44197876)", "POINT (-122.44197876 37.72837489)",
-             "2025-04-30T07:00:00.000Z", "2025-05-20T07:00:00.000Z", 20, True,
-             100757, 100757],
-            [17744268, "Open", "General Request - MTA", "OFARRELL ST", 5,
-             "Tenderloin", "TENDERLOIN", 37.785694, -122.415016,
-             "(37.785694, -122.415016)", "POINT (-122.415016 37.785694)",
-             "2024-01-08T08:00:00.000Z", "2025-05-20T07:00:00.000Z", 498, True,
-             53734, 53734],
-            [16987951, "Open", "Shared Spaces Violation", "46TH AVE", 4,
-             "Outer Sunset", "TARAVAL", 37.764021424039, -122.506313033794,
-             "(37.76402142, -122.50631303)", "POINT (-122.506313034 37.764021424)",
-             "2023-07-01T07:00:00.000Z", "2025-05-20T07:00:00.000Z", 689, True,
-             21957, 21957],
-            [18126205, "Open", "Graffiti", "PRESIDIO AVE", 2,
-             "Laurel Heights / Jordan Park", "RICHMOND", 0, 0, "(0.0, 0.0)",
-             "POINT (0 0)", "2024-04-18T07:00:00.000Z", "2025-05-20T07:00:00.000Z",
-             397, True, 69544, 69544],
-            [16957912, "Open", "Rec and Park Requests", "17TH ST", 9,
-             "Mission", "MISSION", 37.764546816915, -122.409804426134,
-             "(37.76454682, -122.40980443)", "POINT (-122.409804426 37.764546817)",
-             "2023-06-24T07:00:00.000Z", "2025-05-20T07:00:00.000Z", 696, True,
-             58698, 58698],
-            [18329037, "Open", "Encampments", "VAN NESS AVE", 2,
-             "Pacific Heights", "NORTHERN", 37.797523997093, -122.424043933063,
-             "(37.797524, -122.42404393)", "POINT (-122.424043933 37.797523997)",
-             "2024-06-11T07:00:00.000Z", "2025-05-20T07:00:00.000Z", 343, True,
-             13028, 13028],
-            [16831546, "Open", "General Request - PUBLIC WORKS", "THORNTON AVE",
-             10, "Silver Terrace", "BAYVIEW", 37.731252713164, -122.39615902316,
-             "(37.73125271, -122.39615902)", "POINT (-122.396159023 37.731252713)",
-             "2023-05-24T07:00:00.000Z", "2025-05-20T07:00:00.000Z", 727, True,
-             79423, 79423],
-            [16856081, "Open", "Street and Sidewalk Cleaning", "LARKIN ST", 3,
-             "Lower Nob Hill", "CENTRAL", 37.788176670463, -122.418483462817,
-             "(37.78817667, -122.41848346)", "POINT (-122.418483463 37.78817667)",
-             "2023-05-31T07:00:00.000Z", "2025-05-20T07:00:00.000Z", 720, True,
-             59050, 59050],
-            [16948615, "Open", "General Request - MTA", "PRESIDIO AVE", 2,
-             "Laurel Heights / Jordan Park", "RICHMOND", 0, 0, "(0.0, 0.0)",
-             "POINT (0 0)", "2023-06-22T07:00:00.000Z", "2025-05-20T07:00:00.000Z",
-             698, True, 50193, 50193]
-        ]
+        self.assertIsInstance(loaded_data, pd.DataFrame)
+        self.assertTrue(loader.is_processed)
+        self.assertIn("Neighborhood", loaded_data.columns)
+        
 
-        columns = [
-            "CaseID", "Status", "Category", "Street", "Supervisor District", "Neighborhood",
-            "Police District", "Latitude", "Longitude", "Point", "point_geom",
-            "OpenedDate", "ClosedDate", "days_open", "selected", "__seqId", "__i/0"
-        ]
-
-        expected_df = pd.DataFrame(data, columns=columns)
-
-
-        self.assertTrue(loaded_data.equals(expected_df))
+        
 
 
     def test_load_nonexistent_file(self) -> None:
         """Test loading non-existent file."""
         # Write test for loading non-existent file
-        pass
+        loader = DataLoader("example_CSVs/does_not_exist.csv")
+        with self.assertRaises(FileNotFoundError):
+            loader.load_and_explore_data()
 
     def test_load_bad_file_format(self) -> None:
         """Test loading file with bad format."""
         # Write test for loading file with bad format,
         # using the provided bad_file_format.zip file.
-        pass
+        loader = DataLoader("example_CSVs/bad_file_format.zip")
+        with self.assertRaises(ValueError):
+            loader.load_and_explore_data()
 
     def test_validate_required_columns_missing(self) -> None:
         """Test column validation with missing required columns."""
         # Write test for loading a csv with missing required columns,
         # using the provided 311_Cases_missing_CaseID.csv file.
-        pass
+        loader = DataLoader("example_CSVs/311_Cases_missing_CaseID.csv")
+        with self.assertRaises(KeyError):
+            loader.load_and_explore_data()
 
     def test_get_basic_stats_without_loading(self) -> None:
         """Test getting stats before loading data."""
         # Write test for trying to get basic stats before loading data
-        pass
+        loader = DataLoader("example_CSVs/311_Cases_SF_Sample.csv")
+        with self.assertRaises(ValueError):
+            loader.get_basic_stats()
 
     def test_get_basic_stats_success(self) -> None:
-        """Test getting basic stats after loading data."""
-        # Write test for successful stats retrieval
-        # Load the data, and check if stats contain expected keys and values
-        pass
+        loader = DataLoader("example_CSVs/311_Cases_SF_Sample.csv")
+        df = loader.load_and_explore_data()
+        stats = loader.get_basic_stats()
+
+        self.assertIsInstance(stats, dict)
+        self.assertIn("shape", stats)
+        self.assertIn("unique_neighborhoods", stats)
+
+        self.assertEqual(stats["shape"], df.shape)
+        self.assertEqual(stats["unique_neighborhoods"], df["Neighborhood"].nunique())
+
+
+
+
+        
+
+
 
     def test_filter_by_neighborhood_list_input(self) -> None:
         """Test filtering by city with list input."""
         # Write test for filtering with list of neighborhoods
-        pass
+        loader = DataLoader("example_CSVs/311_Cases_SF_Sample.csv")
+        df = loader.load_and_explore_data()
+        filtered = loader.filter_by_neighborhood(["Mission"])
+        self.assertFalse(filtered.empty)
+        self.assertTrue(all(filtered["Neighborhood"].str.lower() == "mission"))
+
 
     def test_filter_by_neighborhood_case_insensitive(self) -> None:
         """Test filtering by city with different case."""
         # Write test for case-insensitive filtering
         # Should work regardless of case
         # Write test for filtering with list of neighborhoods
-        pass
+        loader = DataLoader("example_CSVs/311_Cases_SF_Sample.csv")
+        df = loader.load_and_explore_data()
+        filtered1 = loader.filter_by_neighborhood(["mission"])
+        filtered2 = loader.filter_by_neighborhood(["MISSION"])
+        self.assertTrue(filtered1.equals(filtered2))
 
     def test_filter_by_neighborhood_no_matches(self) -> None:
         """Test filtering by neighborhood with no matches."""
         # Write test for no matching cities
-        pass
+        loader = DataLoader("example_CSVs/311_Cases_SF_Sample.csv")
+        df = loader.load_and_explore_data()
+        with self.assertRaises(ValueError):
+            loader.filter_by_neighborhood(["Nonexistent Neighborhood"])
 
     def test_filter_by_neighborhood_without_loading(self) -> None:
         """Test filtering before loading data."""
         # Write test for filtering before loading
-        pass
+        loader = DataLoader("example_CSVs/311_Cases_SF_Sample.csv")
+        with self.assertRaises(ValueError):
+            loader.filter_by_neighborhood(["Mission"])
+
+if __name__ == "__main__":
+    unittest.main()

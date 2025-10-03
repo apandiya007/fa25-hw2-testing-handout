@@ -4,7 +4,9 @@ Module responsible for loading and basic exploration of 311 cases dataset.
 Follows single responsibility principle: handles data input and initial exploration.
 """
 from typing import Any
+
 import pandas as pd
+import os
 
 class DataLoader:
     """
@@ -15,22 +17,28 @@ class DataLoader:
         """
         Initialize DataLoader with filepath, and set processed flag/property to False.
         """
-        pass
+        if not isinstance(filepath, str) or not filepath:
+            raise ValueError("Filepath must be a non-empty string")
+        self._filepath = filepath
+        self._data: pd.DataFrame | None = None
+        self._processed: bool = False
 
     def load_and_explore_data(self) -> pd.DataFrame:
-        """
-        Load the 311 cases dataset and return the loaded data as a pandas dataframe.
-
-        Returns:
-            pd.DataFrame: Loaded dataset as a pandas DataFrame
-            
-        Raises:
-            FileNotFoundError: If file doesn't exist
-            ValueError: If data cannot be loaded 
-            KeyError: If required columns are missing
-        """
-        pass
-
+        if not os.path.exists(self.filepath):
+            raise FileNotFoundError(f"File not found: {self._filepath}")       
+        try:
+            df = pd.read_csv(self._filepath)
+        except Exception as e:
+            raise ValueError(f"Could not load data: {e}") from e
+        # validates requires columns
+        required_columns = {"neighborhood"}
+        df_columns_lower = set(df.columns.str.lower())
+        missing = required_columns - df_columns_lower
+        if missing:
+            raise KeyError(f"Missing required columns: {missing}")
+        self._data = df
+        self._processed = True
+        return self._data                            
     def get_basic_stats(self) -> dict[str, Any]:
         """
         Get basic statistics about the loaded dataset (shape and number of unique neighborhoods).
@@ -46,7 +54,13 @@ class DataLoader:
         Raises:
             ValueError: If data hasn't been loaded yet
         """
-        pass
+        if self._data is None or not self._processed:
+            raise ValueError("Data has not been loaded yet")
+        stats = {
+            "shape": self._data.shape,
+            "unique_neighborhoods": self._data["neighborhood"].nunique()
+        }
+        return stats   
 
     def filter_by_neighborhood(self, neighborhoods: list[str]) -> pd.DataFrame:
         """
@@ -64,14 +78,30 @@ class DataLoader:
             ValueError: If data isn't loaded yet
             ValueError: If no data matches the filter
         """
-        pass
+        if self._data is None or not self._processed:
+            raise ValueError("Data has not been loaded yet")        
+        if "neighborhood" not in self._data.columns:
+            raise KeyError("Missing required column: neighborhood")
+       
+        neighborhoods_lower = [n.lower() for n in neighborhoods]
+        filtered = self._data[
+            self._data["neighborhood"].str.lower().isin(neighborhoods_lower)
+
+        ]
+
+        if filtered.empty:
+            raise ValueError("No data matches the filter")
+        
+        return filtered
+    
+
 
     @property
     def is_processed(self) -> bool:
         """
         Check if data has been processed. ie. If it has been loaded with load_and_explore_data.
         """
-        pass
+        return self._processed
 
     @property
     def filepath(self) -> str:
@@ -81,4 +111,4 @@ class DataLoader:
         Returns:
             str: File path of the dataset
         """
-        pass
+        return self._filepath
